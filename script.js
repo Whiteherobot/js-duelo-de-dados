@@ -13,7 +13,33 @@ const openHistorialButton = document.getElementById("openHistorial");
 const historialPanel = document.getElementById("historialPanel");
 const popup = document.getElementById("popup");
 const mainContent = document.querySelector("main"); 
-const diceSound = new Audio("dice-roll.mp3"); // Sonido de lanzamiento
+// Sonido del dado sintetizado con Web Audio: unos golpes cortos de ruido, como un
+// dado rebotando. Reemplaza a un mp3 sin fuente ni licencia conocida.
+const diceSound = {
+    contexto: null,
+    play() {
+        const AudioCtx = window.AudioContext || window.webkitAudioContext;
+        if (!AudioCtx) return;
+        this.contexto ??= new AudioCtx();
+        const ctx = this.contexto;
+        const golpes = [0, 0.09, 0.17, 0.24, 0.3];
+        golpes.forEach((t, i) => {
+            const duracion = 0.035;
+            const buffer = ctx.createBuffer(1, Math.ceil(ctx.sampleRate * duracion), ctx.sampleRate);
+            const datos = buffer.getChannelData(0);
+            for (let j = 0; j < datos.length; j++) datos[j] = (Math.random() * 2 - 1) * (1 - j / datos.length);
+            const fuente = ctx.createBufferSource();
+            fuente.buffer = buffer;
+            const filtro = ctx.createBiquadFilter();
+            filtro.type = "bandpass";
+            filtro.frequency.value = 1800 - i * 200;
+            const volumen = ctx.createGain();
+            volumen.gain.value = 0.6 - i * 0.1;
+            fuente.connect(filtro).connect(volumen).connect(ctx.destination);
+            fuente.start(ctx.currentTime + t);
+        });
+    }
+};
 
 // Variable para controlar si se está visualizando una partida guardada
 let viendoPartidaGuardada = false;
