@@ -46,7 +46,8 @@ function lanzarDado() {
 
         if (rolls[currentPlayer] === 1) {
             rolls[currentPlayer] = 0;
-            if (currentPlayer === 1) {
+            // La ronda avanza cuando tira el jugador 2, salvo en la última (si no, mostraba "Ronda 4").
+            if (currentPlayer === 1 && turn < 6) {
                 round++;
                 document.getElementById("round").innerText = round;
             }
@@ -313,23 +314,8 @@ function reiniciarJuego() {
         const popup = document.getElementById("popup");
         popup.classList.add("show");
 
-        // Actualizar los nombres de los jugadores después de cerrar la ventana emergente
-        document.getElementById("startGame").addEventListener("click", function () {
-            const player1Name = document.getElementById("player1Name").value.trim();
-            const player2Name = document.getElementById("player2Name").value.trim();
-
-            if (player1Name) playerNames[0] = player1Name;
-            if (player2Name) playerNames[1] = player2Name;
-
-            document.querySelectorAll(".player h2")[0].innerText = playerNames[0];
-            document.querySelectorAll(".player h2")[1].innerText = playerNames[1];
-
-            // Ocultar la ventana emergente
-            popup.classList.remove("show");
-
-            // Actualizar la interfaz con la copa
-            actualizarCopa();
-        });
+        // El botón "Empezar Juego" ya tiene su listener (al final del archivo): agregar otro
+        // aquí lo duplicaba en cada reinicio.
     });
 }
 // Función para reiniciar el estado del juego
