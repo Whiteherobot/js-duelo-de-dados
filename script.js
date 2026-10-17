@@ -266,13 +266,14 @@ function agregarGanadorAlHistorial() {
     // Determinar quién ganó
     let ganador;
     if (scores[0] > scores[1]) {
-        ganador = `${playerNames[0]} ganó 🎉 🏆`;
+        ganador = `${playerNames[0]} ganó 🎉`;
     } else if (scores[0] < scores[1]) {
-        ganador = `${playerNames[1]} ganó 🎉 🏆`;
+        ganador = `${playerNames[1]} ganó 🎉`;
     } else {
         ganador = "¡Empate! 🤝";
     }
 
+    // El trofeo no va aquí: marca solo al dueño de la mejor puntuación (títulos y partidas guardadas).
     // Agregar una fila al final de la tabla del historial
     const table = document.getElementById("history");
     const row = table.insertRow();
