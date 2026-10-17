@@ -42,6 +42,7 @@ test('una partida dura tres rondas y termina en la ronda 3', () => {
   assert.equal(j.$('#score1').textContent, '15');
   assert.equal(j.$('#score2').textContent, '6');
   assert.equal(j.$('#round').textContent, '3');
+  assert.equal(j.$('#turn').textContent, 'Partida terminada');
   assert.match(j.$('#winnerMessage').textContent, /Ana gana/);
   assert.equal(j.$('#rollDice').disabled, true);
   // Seis lanzamientos más la fila del ganador.

@@ -222,6 +222,7 @@ function cerrarVistaPartidaGuardada() {
 // Función para determinar el ganador
 function determinarGanador() {
     document.getElementById("rollDice").disabled = true; 
+    document.getElementById("turn").innerText = "Partida terminada";
     turnoActivo = false; 
 
     let message;
