@@ -90,14 +90,18 @@ function limpiarHistorial() {
         </tr>
     `;
 }
+// Agrega una fila jugador / lanzamiento. Usa textContent porque el nombre lo escribe el
+// usuario: con innerHTML un nombre como <img onerror=...> se ejecutaba.
+function agregarFilaHistorial(table, jugador, lanzamiento) {
+    const row = table.insertRow();
+    const nombre = document.createElement("strong");
+    nombre.textContent = jugador;
+    row.insertCell(0).appendChild(nombre);
+    row.insertCell(1).textContent = lanzamiento;
+}
 // Función para actualizar el historial
 function actualizarHistorial(player, roll) {
-    const table = document.getElementById("history");
-    const row = table.insertRow();
-    row.innerHTML = `
-        <td><strong>${playerNames[player]}</strong></td>
-        <td>${roll}</td>
-    `;
+    agregarFilaHistorial(document.getElementById("history"), playerNames[player], roll);
 
     guardarHistorialEnLocalStorage();
 }
@@ -140,7 +144,8 @@ function actualizarListaPartidas() {
     savedGames.forEach((partida, index) => {
         const li = document.createElement("li");
         
-        const ganadorConTrofeo = partida.ganador.includes(bestScorePlayer)
+        // Sin mejor jugador guardado, "".includes("") daba true y todas llevaban trofeo.
+        const ganadorConTrofeo = bestScorePlayer && partida.ganador.includes(bestScorePlayer)
             ? `${partida.ganador} 🏆`
             : partida.ganador;
 
@@ -163,11 +168,7 @@ function mostrarMovimientosPartida(index) {
 
     
     partida.movimientos.forEach(movimiento => {
-        const row = table.insertRow();
-        row.innerHTML = `
-            <td><strong>${movimiento.jugador}</strong></td>
-            <td>${movimiento.lanzamiento}</td>
-        `;
+        agregarFilaHistorial(table, movimiento.jugador, movimiento.lanzamiento);
     });
 
     const row = table.insertRow();
@@ -263,7 +264,11 @@ function agregarGanadorAlHistorial() {
 // Función para reiniciar el mejor puntaje
 function reiniciarBestScore() {
     bestScore = 0; 
+    bestScorePlayer = "";
     localStorage.setItem("bestScore", bestScore); 
+    localStorage.removeItem("bestScorePlayer");
+    actualizarCopa();
+    actualizarListaPartidas();
     document.getElementById("bestScore").innerText = `Mejor Puntuación: ${bestScore}`; 
 }
 // Función para reiniciar el juego
@@ -346,15 +351,6 @@ function resetGameState() {
     // Actualizar la interfaz con la copa
     actualizarCopa();
 }
-// Función para personalizar nombres
-function personalizarNombres() {
-    let name1 = prompt("Ingresa el nombre del Jugador 1", playerNames[0]);
-    let name2 = prompt("Ingresa el nombre del Jugador 2", playerNames[1]);
-    if (name1) playerNames[0] = name1;
-    if (name2) playerNames[1] = name2;
-    document.querySelectorAll(".player h2")[0].innerText = playerNames[0];
-    document.querySelectorAll(".player h2")[1].innerText = playerNames[1];
-}
 // Función para guardar el historial en localStorage
 function guardarHistorialEnLocalStorage() {
     const table = document.getElementById("history");
@@ -370,14 +366,10 @@ function cargarHistorialDesdeLocalStorage() {
     const historial = JSON.parse(localStorage.getItem("historial")) || [];
     const table = document.getElementById("history");
     historial.forEach(entry => {
-        const row = table.insertRow();
         if (entry.lanzamiento) {
-            row.innerHTML = `
-                <td><strong>${entry.jugador}</strong></td>
-                <td>${entry.lanzamiento}</td>
-            `;
+            agregarFilaHistorial(table, entry.jugador, entry.lanzamiento);
         } else {
-            const cell = row.insertCell(0);
+            const cell = table.insertRow().insertCell(0);
             cell.colSpan = 2; // Hacer que la celda ocupe las dos columnas
             cell.innerText = entry.jugador; // Mostrar el ganador
             cell.style.textAlign = "center";
@@ -455,6 +447,8 @@ document.getElementById("clearHistory").addEventListener("click", borrarHistoria
 document.addEventListener("keydown", (e) => {
     const popup = document.getElementById("popup");
     if (e.code === "Space" && turnoActivo && !juegoTerminado && !popup.classList.contains("show")) {
+        // Sin esto, la barra también desplaza la página o "presiona" el botón que tenga el foco.
+        e.preventDefault();
         if (viendoPartidaGuardada) {
             cerrarVistaPartidaGuardada(); // Cerrar automáticamente la vista de la partida guardada
         }
