@@ -83,6 +83,7 @@ test('el ganador con mejor puntaje recibe el trofeo y reiniciar el récord se lo
   j.lanzar(6);
 
   assert.equal(j.w.localStorage.getItem('bestScore'), '18');
+  assert.equal(j.$('#bestScore').textContent, 'Mejor Puntuación: 18');
   assert.match(j.$('.player h2').textContent, /🏆/);
   assert.match(j.$('#savedGames li').textContent, /🏆/);
 

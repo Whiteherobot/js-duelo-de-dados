@@ -247,6 +247,8 @@ function actualizarMejorScore(player, score) {
         bestScorePlayer = player;
         localStorage.setItem("bestScore", bestScore);
         localStorage.setItem("bestScorePlayer", bestScorePlayer);
+        // Antes el texto solo se refrescaba al reiniciar y seguía mostrando el récord anterior.
+        document.getElementById("bestScore").innerText = `Mejor Puntuación: ${bestScore}`;
     }
 }
 // Función para actualizar la copa en la interfaz
